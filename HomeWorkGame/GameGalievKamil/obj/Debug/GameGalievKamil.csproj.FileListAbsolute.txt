@@ -1,0 +1,7 @@
+C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGalievKamil\obj\Debug\GameGalievKamil.csprojAssemblyReference.cache
+C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGalievKamil\obj\Debug\GameGalievKamil.csproj.CoreCompileInputs.cache
+C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGalievKamil\bin\Debug\GameGalievKamil.exe.config
+C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGalievKamil\bin\Debug\GameGalievKamil.exe
+C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGalievKamil\bin\Debug\GameGalievKamil.pdb
+C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGalievKamil\obj\Debug\GameGalievKamil.exe
+C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGalievKamil\obj\Debug\GameGalievKamil.pdb
