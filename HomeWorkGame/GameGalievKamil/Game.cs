@@ -53,9 +53,9 @@ namespace GameGalievKamil
 
         public static void Draw()
         {
-            // Проверяем вывод графики
+            
             Buffer.Graphics.Clear(Color.Black);
-            //Buffer.Graphics.DrawRectangle(Pens.White, new Rectangle(100, 100, 200, 200));
+            
             Buffer.Graphics.FillEllipse(Brushes.Wheat, new Rectangle(650, 10, 100, 100));
             Buffer.Render();
 
