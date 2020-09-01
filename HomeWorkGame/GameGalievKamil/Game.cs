@@ -13,6 +13,9 @@ namespace GameGalievKamil
         private static BufferedGraphicsContext _context;
         public static BufferedGraphics Buffer;
         static BaseObject[] _objs;
+        static Timer timer;
+        private static Bullet _bullet;
+        private static Asteroid[] _asteroids;
 
         // Свойства
         // Ширина и высота игрового поля
@@ -32,23 +35,37 @@ namespace GameGalievKamil
             // Запоминаем размеры формы
             Width = form.ClientSize.Width;
             Height = form.ClientSize.Height;
+            form.FormClosing += Form_FormClosing;
             // Связываем буфер в памяти с графическим объектом, чтобы рисовать в буфере
             Buffer = _context.Allocate(g, new Rectangle(0, 0, Width, Height));
             Load();
-            Timer timer = new Timer { Interval = 100 };
+            timer = new Timer { Interval = 100 };
             timer.Start();
             timer.Tick += Timer_Tick;
         }
 
+        private static void Form_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            timer.Stop();
+        }
+
         public static void Load()
         {
-            _objs = new BaseObject[80];
-            for (int i = 0; i < _objs.Length / 4; i++)
-                _objs[i] = new BaseObject(new Point(600, i * 20), new Point(-i, -i), new Size(10, 10));
-            for (int i = _objs.Length / 4; i < _objs.Length / 2; i++)
-                _objs[i] = new Star(new Point(600, (i - 20) * 20), new Point(-i, 0), new Size(5, 5));
-            for (int i = (_objs.Length / 2); i < _objs.Length; i++)
-                _objs[i] = new Star(new Point(600, i * 18), new Point(-i, 0), new Size(5, 5));
+            _objs = new BaseObject[30];
+            _bullet = new Bullet(new Point(0, 200), new Point(5, 0), new Size(4, 1));
+            _asteroids = new Asteroid[60];
+            var rnd = new Random();
+            for (var i = 0; i < _objs.Length; i++)
+            {
+                int r = rnd.Next(5, 50);
+                _objs[i] = new Star(new Point(1000, rnd.Next(0, Game.Height)), new Point(-r, r), new Size(3, 3));
+            }
+            for (var i = 0; i < _asteroids.Length; i++)
+            {
+                int r = rnd.Next(5, 50);
+                _asteroids[i] = new Asteroid(new Point(1000, rnd.Next(0, Game.Height)), new Point(-r / 5, r), new Size(r, r));
+            }
+
         }
 
         public static void Draw()
@@ -57,18 +74,46 @@ namespace GameGalievKamil
             Buffer.Graphics.Clear(Color.Black);
             
             Buffer.Graphics.FillEllipse(Brushes.Wheat, new Rectangle(650, 10, 100, 100));
-            Buffer.Render();
+            //Buffer.Render();
 
             //Buffer.Graphics.Clear(Color.Black);
+            Buffer.Graphics.Clear(Color.Black);
             foreach (BaseObject obj in _objs)
                 obj.Draw();
+            foreach (Asteroid obj in _asteroids)
+                obj.Draw();
+            _bullet.Draw();
+            
+
             Buffer.Render();
         }
-
+        
         public static void Update()
         {
             foreach (BaseObject obj in _objs)
                 obj.Update();
+            var rnd = new Random();
+
+            foreach (Asteroid a in _asteroids)
+            {
+                
+                a.Update();
+                //Проверка попадания снаряда по астероиду
+                if (a.Collision(_bullet)) 
+                { 
+                    //Если снарад попал то Воспроизводим системный звук и создаем новый снаряд
+                    System.Media.SystemSounds.Hand.Play();
+                    _bullet = new Bullet(new Point(0, 200), new Point(5, 0), new Size(4, 1));
+                    //После попадания снаряда, астероид уничтожается и создается заново с новыми координатами и размром
+                    for (int i = 0; i < _asteroids.Length; i++)
+                        if (_asteroids[i] == a)
+                        {
+                            int r = rnd.Next(5, 50);
+                            _asteroids[i] = new Asteroid(new Point(1000, rnd.Next(0, Game.Height)), new Point(-r / 5, r), new Size(r, r));
+                        }
+                }
+            }
+            _bullet.Update();
         }
         private static void Timer_Tick(object sender, EventArgs e)
         {
