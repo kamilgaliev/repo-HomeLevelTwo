@@ -5,3 +5,5 @@ C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGaliev
 C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGalievKamil\bin\Debug\GameGalievKamil.pdb
 C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGalievKamil\obj\Debug\GameGalievKamil.exe
 C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGalievKamil\obj\Debug\GameGalievKamil.pdb
+C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGalievKamil\obj\Debug\GameGalievKamil.SplashScreen.resources
+C:\Users\kamil\Documents\geekbrains\C#\repo-HomeLevelTwo\HomeWorkGame\GameGalievKamil\obj\Debug\GameGalievKamil.csproj.GenerateResource.cache
