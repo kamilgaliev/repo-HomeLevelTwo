@@ -3,11 +3,16 @@ using System.Drawing;
 
 namespace GameGalievKamil
 {
+    public delegate void Message();
     abstract class BaseObject : ICollision
     {
         protected Point Pos;
         protected Point Dir;
         protected Size Size;
+
+        protected BaseObject()
+        {
+        }
 
         protected BaseObject(Point pos, Point dir, Size size)
         {
