@@ -36,15 +36,15 @@ namespace GameGalievKamil
             Buffer.Render();
 
             //Buffer.Graphics.Clear(Color.Black);
-            foreach (BaseObject obj in _objs)
-                obj.DrawStart();
-            Buffer.Render();
+            //foreach (BaseObject obj in _objs)
+            //    obj.DrawStart();
+            //Buffer.Render();
         }
 
         public static void UpdateStart()
         {
-            foreach (BaseObject obj in _objs)
-                obj.UpdateStart();
+            //foreach (BaseObject obj in _objs)
+            //    obj.UpdateStart();
         }
         private static void Timer_Tick(object sender, EventArgs e)
         {
@@ -67,28 +67,28 @@ namespace GameGalievKamil
 
         private void SplashScreen_Load(object sender, EventArgs e)
         {
-            // Графическое устройство для вывода графики            
-            Graphics g;
-            // Предоставляет доступ к главному буферу графического контекста для текущего приложения
-            _context = BufferedGraphicsManager.Current;
-            g = this.CreateGraphics();
-            // Создаем объект (поверхность рисования) и связываем его с формой
-            // Запоминаем размеры формы
-            Width = this.Size.Width;
-            Height = this.Size.Height;
-            // Связываем буфер в памяти с графическим объектом, чтобы рисовать в буфере
-            Buffer = _context.Allocate(g, new Rectangle(0, 0, Width, Height));
+            //// Графическое устройство для вывода графики            
+            //Graphics g;
+            //// Предоставляет доступ к главному буферу графического контекста для текущего приложения
+            //_context = BufferedGraphicsManager.Current;
+            //g = this.CreateGraphics();
+            //// Создаем объект (поверхность рисования) и связываем его с формой
+            //// Запоминаем размеры формы
+            //Width = this.Size.Width;
+            //Height = this.Size.Height;
+            //// Связываем буфер в памяти с графическим объектом, чтобы рисовать в буфере
+            //Buffer = _context.Allocate(g, new Rectangle(0, 0, Width, Height));
             
             
 
-            _objs = new BaseObject[20];
-            for (int i = 0; i < _objs.Length; i++)
-                _objs[i] = new BaseObject(new Point(600, i * 20), new Point(-i, -i), new Size(10, 10));
+            //_objs = new BaseObject[20];
+            //for (int i = 0; i < _objs.Length; i++)
+            //    _objs[i] = new BaseObject(new Point(600, i * 20), new Point(-i, -i), new Size(10, 10));
          
 
-            Timer timer = new Timer { Interval = 100 };
-            timer.Start();
-            timer.Tick += Timer_Tick;
+            //Timer timer = new Timer { Interval = 100 };
+            //timer.Start();
+            //timer.Tick += Timer_Tick;
         }
     }
 }
