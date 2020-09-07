@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
 using System.IO;
+using System.Globalization;
 
 namespace GameGalievKamil
 {
@@ -20,10 +21,12 @@ namespace GameGalievKamil
         static BaseObject[] _objs;
         private static Timer _timer = new Timer();
         public static int score = 0;
+        public static int level = 1;
         public static Random Rnd = new Random();
-        private static Bullet _bullet;
+        private static List<Bullet> _bullets = new List<Bullet>();
         private static HealthBox _health;
-        private static Asteroid[] _asteroids;
+        private static List<Asteroid> _asteroids = new List<Asteroid>();
+        public static int AsterCount = 10;
         private static Ship _ship = new Ship(new Point(10, 400), new Point(5, 5), new Size(30, 30));
 
         // Свойства
@@ -66,7 +69,10 @@ namespace GameGalievKamil
         /// <param name="e"></param>
         private static void Form_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.ControlKey) _bullet = new Bullet(new Point(_ship.Rect.X + 15, _ship.Rect.Y + 15), new Point(4, 0), new Size(4, 1));
+            if (e.KeyCode == Keys.ControlKey)
+            { 
+                _bullets.Add(new Bullet(new Point(_ship.Rect.X + 15, _ship.Rect.Y + 15), new Point(4, 0), new Size(4, 1)));
+            }
             if (e.KeyCode == Keys.Up) _ship.Up();
             if (e.KeyCode == Keys.Down) _ship.Down();
             if (e.KeyCode == Keys.Right) _ship.Right();
@@ -85,7 +91,7 @@ namespace GameGalievKamil
             _objs = new BaseObject[30];
             //_bullet = new Bullet(new Point(0, 415), new Point(5, 0), new Size(4, 1));
             
-            _asteroids = new Asteroid[10];
+            
             var rnd = new Random();
             _health = new HealthBox(new Point(1000, rnd.Next(0, Game.Height)), new Point(-10, 10), new Size(40, 40));
             for (var i = 0; i < _objs.Length; i++)
@@ -93,11 +99,9 @@ namespace GameGalievKamil
                 int r = rnd.Next(5, 50);
                 _objs[i] = new Star(new Point(1000, rnd.Next(0, Game.Height)), new Point(-r, r), new Size(3, 3));
             }
-            for (var i = 0; i < _asteroids.Length; i++)
-            {
-                int r = rnd.Next(5, 50);
-                _asteroids[i] = new Asteroid(new Point(1000, rnd.Next(0, Game.Height - r)), new Point(-r / 5, r), new Size(r, r));
-            }
+
+            MakeAster();
+
             ActionMes?.Invoke($"{DateTime.Now} - Запуск игры");
         }
 
@@ -115,11 +119,14 @@ namespace GameGalievKamil
                 obj.Draw();
             foreach (Asteroid obj in _asteroids)
                 obj?.Draw();
-            _bullet?.Draw();
+            foreach (Bullet b in _bullets) b.Draw();
             _health?.Draw();
             _ship?.Draw();
             if (_ship != null)
+            { 
                 Buffer.Graphics.DrawString($"Energy:   {_ship.Energy}   \nScore:  {score}", SystemFonts.DefaultFont, Brushes.White, 0, 0);
+                Buffer.Graphics.DrawString($"Level:   {level}", SystemFonts.DefaultFont, Brushes.Orange, 360, 0);
+            }
             
             
 
@@ -128,38 +135,73 @@ namespace GameGalievKamil
         
         public static void Update()
         {
+            
             foreach (BaseObject obj in _objs) obj.Update();
-            _bullet?.Update();
+            foreach (Bullet b in _bullets) b.Update();
             _health.Update();
-            for (var i = 0; i < _asteroids.Length; i++)
+            if (_asteroids.Count == 0)
             {
-                var rnd = new Random();
-                if (_asteroids[i] == null) 
-                    continue;
-                _asteroids[i].Update();
-                if (_bullet != null && _bullet.Collision(_asteroids[i]))
-                {
-                    System.Media.SystemSounds.Hand.Play();
-                    score++;
-                    ActionMes?.Invoke($"{DateTime.Now} - Ракета уничтожила астероид. Счет: {score}");
-                    int r = rnd.Next(5, 50);
-                    _asteroids[i] = new Asteroid(new Point(1000, rnd.Next(0, Game.Height-r)), new Point(-r / 5, r), new Size(r, r));
-                    _bullet = null;
-                    continue;
-                }
-                if (!_ship.Collision(_asteroids[i]))
-                    continue;
-                else
-                {
-                    _ship?.EnergyLow(rnd.Next(1, 10));
-                    ActionMes?.Invoke($"{DateTime.Now} - Корабль получил урон. Энергия: {_ship.Energy}");
-                    System.Media.SystemSounds.Asterisk.Play();
-                    int r = rnd.Next(5, 50);
-                    _asteroids[i] = new Asteroid(new Point(1000, rnd.Next(0, Game.Height - r)), new Point(-r / 5, r), new Size(r, r));
-                    if (_ship.Energy <= 0) _ship?.Die();
+                AsterCount++;
+                level++;
 
+                MakeAster();
+                for (var i = 0; i < _asteroids.Count(); i++)
+                {
+                    _asteroids[i].Update();
                 }
             }
+            else
+                for (var i = 0; i < _asteroids.Count(); i++)
+                {
+                    var rnd = new Random();
+                    //if (_asteroids[i] == null) 
+                    //    continue;
+                    _asteroids[i].Update();
+                    try
+                    {
+                        for (int j = 0; j < _bullets.Count; j++)
+                        {
+                            if (_asteroids[i] != null && _bullets[j].Collision(_asteroids[i]))
+                            {
+                                System.Media.SystemSounds.Hand.Play();
+                                score++;
+                                _bullets.RemoveAt(j);
+                                ActionMes?.Invoke($"{DateTime.Now} - Ракета уничтожила астероид. Счет: {score}");
+
+                                _asteroids.RemoveAt(i);
+
+                                i--;
+                                j--;
+                            }
+
+
+                        }
+                    }
+                    catch(ArgumentOutOfRangeException e)
+                    {
+                        Update();
+                    }
+                    if (i < 0)
+                        break;
+                    if (!_ship.Collision(_asteroids[i]))
+                        continue;
+                    else
+                    {
+                        _ship?.EnergyLow(rnd.Next(1, 10));
+                        ActionMes?.Invoke($"{DateTime.Now} - Корабль получил урон. Энергия: {_ship.Energy}");
+                        System.Media.SystemSounds.Asterisk.Play();
+                        int r = rnd.Next(5, 50);
+                        _asteroids[i] = new Asteroid(new Point(1000, rnd.Next(0, Game.Height - r)), new Point(-r / 5, r), new Size(r, r));
+                        if (_ship.Energy <= 0) _ship?.Die();
+
+                    }
+                }
+            for (int j = 0; j < _bullets.Count; j++)
+            {
+                if (_bullets[j].Rect.X >= Game.Width)
+                { _bullets.RemoveAt(j); }
+            }
+            
             UpdateHealth();
 
 
@@ -170,15 +212,18 @@ namespace GameGalievKamil
         private static void UpdateHealth()
         {
             var rnd = new Random();
-            if (_bullet != null && _bullet.Collision(_health))
-            {
-                System.Media.SystemSounds.Hand.Play();
-                _ship?.EnergyUp(_health.GetHealth);
-                ActionMes?.Invoke($"{DateTime.Now} - Ракета попала в аптечку. Энергия: {_ship.Energy}");
-                _health = new HealthBox(new Point(1000, rnd.Next(0, Game.Height - 40)), new Point(-10, 10), new Size(40, 40));
 
-                _bullet = null;
-            }
+            for (int j = 0; j < _bullets.Count; j++)
+                if (_bullets[j] != null && _bullets[j].Collision(_health))
+                {
+                        System.Media.SystemSounds.Hand.Play();
+                    _ship?.EnergyUp(_health.GetHealth);
+                    ActionMes?.Invoke($"{DateTime.Now} - Ракета попала в аптечку. Энергия: {_ship.Energy}");
+                    _health = new HealthBox(new Point(1000, rnd.Next(0, Game.Height - 40)), new Point(-10, 10), new Size(40, 40));
+
+                    _bullets.RemoveAt(j);
+                    j--;
+                }
             if (_ship.Collision(_health))
             {
                 System.Media.SystemSounds.Hand.Play();
@@ -201,6 +246,18 @@ namespace GameGalievKamil
             Buffer.Graphics.DrawString("Вы проиграли!", new Font(FontFamily.GenericSansSerif, 60, FontStyle.Underline), Brushes.White, 100, 200);
             ActionMes?.Invoke($"{DateTime.Now} - Игра окончена");
             Buffer.Render();
+        }
+
+        private static void MakeAster()
+        {
+
+            var rnd = new Random();
+            
+            for (var i = 0; i < AsterCount; i++)
+            {
+                int r = rnd.Next(5, 50);
+                _asteroids.Add(new Asteroid(new Point(1000, rnd.Next(0, Game.Height - r)), new Point(-r / 5, r), new Size(r, r)));
+            }
         }
         /// <summary>
         /// Обработка для события ActionMes
